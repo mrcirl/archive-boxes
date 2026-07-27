@@ -29,24 +29,26 @@ both a full 3D view and an auto top-down 2D floor plan.
 
 ## Running locally
 
-In one terminal:
+One-time setup, from the repo root:
 
 ```bash
-cd server
-npm install
-npm run dev   # http://localhost:4000
+npm install     # root tooling (concurrently)
+npm run setup   # installs server/ and client/ dependencies
 ```
 
-In another:
+Then, every time:
 
 ```bash
-cd client
-npm install
-npm run dev   # http://localhost:5173
+npm start
 ```
 
-The client reads the API base URL from `client/.env` (`VITE_API_BASE`,
-defaults to `http://localhost:4000`).
+That launches the API (http://localhost:4000) and the app
+(http://localhost:5173) together and opens the app in your browser.
+Stop both with a single Ctrl+C.
+
+You can still run the halves separately (`npm run dev` inside `server/` or
+`client/`) if you prefer. The client reads the API base URL from
+`client/.env` (`VITE_API_BASE`, defaults to `http://localhost:4000`).
 
 ## How it works
 

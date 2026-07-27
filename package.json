@@ -1,0 +1,13 @@
+{
+  "name": "roomlayout",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "npm install --prefix server && npm install --prefix client",
+    "start": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client -- --open\"",
+    "dev": "npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
