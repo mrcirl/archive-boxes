@@ -27,6 +27,8 @@ export interface FurnitureInstance {
   depthM?: number;
   heightM?: number;
   hollow?: HollowStyle;
+  /** Locked items can't be dragged, rotated, or deleted until unlocked. */
+  locked?: boolean;
 }
 
 export interface CustomItem {

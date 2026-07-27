@@ -12,8 +12,13 @@ interface ToolbarProps {
 export function Toolbar({ mode, onModeChange, onSave, saving }: ToolbarProps) {
   const dirty = useLayoutStore((s) => s.dirty);
   const selectedId = useLayoutStore((s) => s.selectedId);
+  const furniture = useLayoutStore((s) => s.furniture);
   const rotateItem = useLayoutStore((s) => s.rotateItem);
   const removeItem = useLayoutStore((s) => s.removeItem);
+  const toggleLock = useLayoutStore((s) => s.toggleLock);
+
+  const selected = furniture.find((f) => f.id === selectedId);
+  const isLocked = selected?.locked ?? false;
 
   return (
     <div className="toolbar">
@@ -27,13 +32,20 @@ export function Toolbar({ mode, onModeChange, onSave, saving }: ToolbarProps) {
       </div>
 
       <div className="toolbar-group">
-        <button disabled={!selectedId} onClick={() => selectedId && rotateItem(selectedId, -Math.PI / 8)}>
+        <button disabled={!selectedId || isLocked} onClick={() => selectedId && rotateItem(selectedId, -Math.PI / 8)}>
           ⟲ Rotate
         </button>
-        <button disabled={!selectedId} onClick={() => selectedId && rotateItem(selectedId, Math.PI / 8)}>
+        <button disabled={!selectedId || isLocked} onClick={() => selectedId && rotateItem(selectedId, Math.PI / 8)}>
           Rotate ⟳
         </button>
-        <button disabled={!selectedId} onClick={() => selectedId && removeItem(selectedId)}>
+        <button
+          className={isLocked ? 'active' : ''}
+          disabled={!selectedId}
+          onClick={() => selectedId && toggleLock(selectedId)}
+        >
+          {isLocked ? '🔒 Locked' : '🔓 Lock to floor'}
+        </button>
+        <button disabled={!selectedId || isLocked} onClick={() => selectedId && removeItem(selectedId)}>
           Delete
         </button>
       </div>

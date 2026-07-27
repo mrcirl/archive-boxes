@@ -15,6 +15,7 @@ interface LayoutState {
   updateItem: (id: string, patch: Partial<FurnitureInstance>) => void;
   rotateItem: (id: string, deltaRad: number) => void;
   removeItem: (id: string) => void;
+  toggleLock: (id: string) => void;
   select: (id: string | null) => void;
   setDragging: (id: string | null) => void;
   markSaved: () => void;
@@ -43,7 +44,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
 
   setPosition: (id, x, z) =>
     set((state) => ({
-      furniture: state.furniture.map((f) => (f.id === id ? { ...f, x, z } : f)),
+      furniture: state.furniture.map((f) => (f.id === id && !f.locked ? { ...f, x, z } : f)),
       dirty: true,
     })),
 
@@ -56,15 +57,25 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   rotateItem: (id, deltaRad) =>
     set((state) => ({
       furniture: state.furniture.map((f) =>
-        f.id === id ? { ...f, rotationY: f.rotationY + deltaRad } : f
+        f.id === id && !f.locked ? { ...f, rotationY: f.rotationY + deltaRad } : f
       ),
       dirty: true,
     })),
 
   removeItem: (id) =>
+    set((state) => {
+      const target = state.furniture.find((f) => f.id === id);
+      if (target?.locked) return state;
+      return {
+        furniture: state.furniture.filter((f) => f.id !== id),
+        selectedId: state.selectedId === id ? null : state.selectedId,
+        dirty: true,
+      };
+    }),
+
+  toggleLock: (id) =>
     set((state) => ({
-      furniture: state.furniture.filter((f) => f.id !== id),
-      selectedId: state.selectedId === id ? null : state.selectedId,
+      furniture: state.furniture.map((f) => (f.id === id ? { ...f, locked: !f.locked } : f)),
       dirty: true,
     })),
 

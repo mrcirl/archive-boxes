@@ -113,7 +113,7 @@ export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: V
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     select(item.id);
-    setDragging(item.id);
+    if (!item.locked) setDragging(item.id);
   };
 
   // With a reference photo (and no model), draw the box as a thin footprint
@@ -159,7 +159,7 @@ export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: V
       {isSelected && (
         <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[Math.max(def.widthM, def.depthM) * 0.62, Math.max(def.widthM, def.depthM) * 0.68, 32]} />
-          <meshBasicMaterial color="#4da3ff" />
+          <meshBasicMaterial color={item.locked ? '#e0a63e' : '#4da3ff'} />
         </mesh>
       )}
     </group>

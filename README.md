@@ -65,7 +65,11 @@ You can still run the halves separately (`npm run dev` inside `server/` or
    desks from the same catalog entry can differ) and its structure: solid,
    hollow with an open top (box/bin), or hollow with an open front
    (rack/bookcase). Hollow items render as actual shells with a visibly
-   darker cavity, and the opening rotates with the item.
+   darker cavity, and the opening rotates with the item. "🔓 Lock to floor"
+   in the toolbar locks the selected item in place — dragging, rotating, and
+   deleting are all blocked (in both the UI and the store's own action
+   guards) until you unlock it again; a locked item's selection ring turns
+   amber instead of blue as a reminder.
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 
