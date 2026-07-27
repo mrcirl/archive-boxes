@@ -5,6 +5,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { ScanMesh } from './ScanMesh';
 import { FurnitureMesh } from './FurnitureMesh';
+import { RoomDimensions } from './RoomDimensions';
 import { useLayoutStore } from '../store/layoutStore';
 import { useBoundsStore } from '../store/boundsStore';
 import type { Scan } from '../types';
@@ -122,10 +123,12 @@ export function SceneCanvas({
   scan,
   mode,
   showDimensions,
+  showRoomDimensions,
 }: {
   scan: Scan;
   mode: ViewMode;
   showDimensions: boolean;
+  showRoomDimensions: boolean;
 }) {
   const furniture = useLayoutStore((s) => s.furniture);
   const select = useLayoutStore((s) => s.select);
@@ -140,6 +143,7 @@ export function SceneCanvas({
       <Grid args={[200, 200]} cellColor="#888" sectionColor="#555" fadeDistance={80} position={[0, 0, 0]} />
       <DragPlane />
       <ScanMesh scan={scan} />
+      {showRoomDimensions && <RoomDimensions mode={mode} />}
       {furniture.map((item) => (
         <FurnitureMesh key={item.id} item={item} mode={mode} showDimensions={showDimensions} />
       ))}

@@ -9,6 +9,8 @@ interface ToolbarProps {
   saving: boolean;
   showDimensions: boolean;
   onToggleDimensions: () => void;
+  showRoomDimensions: boolean;
+  onToggleRoomDimensions: () => void;
 }
 
 export function Toolbar({
@@ -18,6 +20,8 @@ export function Toolbar({
   saving,
   showDimensions,
   onToggleDimensions,
+  showRoomDimensions,
+  onToggleRoomDimensions,
 }: ToolbarProps) {
   const dirty = useLayoutStore((s) => s.dirty);
   const selectedId = useLayoutStore((s) => s.selectedId);
@@ -40,6 +44,9 @@ export function Toolbar({
         </button>
         <button className={showDimensions ? 'active' : ''} onClick={onToggleDimensions}>
           📏 Dimensions
+        </button>
+        <button className={showRoomDimensions ? 'active' : ''} onClick={onToggleRoomDimensions}>
+          📐 Room size
         </button>
       </div>
 

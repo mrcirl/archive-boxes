@@ -478,3 +478,15 @@ button.active {
   pointer-events: none;
   transform: translateY(-4px);
 }
+
+.room-dimension-label {
+  background: rgba(20, 21, 26, 0.9);
+  border: 1px solid #4a6b8a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cfe3ff;
+  white-space: nowrap;
+  pointer-events: none;
+}

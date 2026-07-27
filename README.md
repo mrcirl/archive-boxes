@@ -72,7 +72,15 @@ You can still run the halves separately (`npm run dev` inside `server/` or
    amber instead of blue as a reminder. "📏 Dimensions" toggles a W×D×H
    label floating over every placed item at once (not just the selected
    one), in both 3D and 2D — handy for eyeballing a whole layout's sizes
-   without clicking through each item's properties panel.
+   without clicking through each item's properties panel. "📐 Room size" is
+   a separate toggle for the scanned room's own overall size: a label in
+   both views, plus measured edges with tick marks along two sides in the
+   2D floor plan. Real scans are rarely simple rectangles (rotated,
+   irregular footprints are the norm — see the attic example above), so
+   this is always labeled as the axis-aligned bounding box, not the exact
+   footprint or individual wall lengths; getting real per-wall measurements
+   would need actual wall-segment detection, which is a separate, bigger
+   feature.
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 

@@ -18,6 +18,7 @@ export function ProjectEditor({
   const [scan, setScan] = useState<Scan | null>(null);
   const [mode, setMode] = useState<ViewMode>('3d');
   const [showDimensions, setShowDimensions] = useState(false);
+  const [showRoomDimensions, setShowRoomDimensions] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const load = useLayoutStore((s) => s.load);
@@ -79,11 +80,18 @@ export function ProjectEditor({
         saving={saving}
         showDimensions={showDimensions}
         onToggleDimensions={() => setShowDimensions((v) => !v)}
+        showRoomDimensions={showRoomDimensions}
+        onToggleRoomDimensions={() => setShowRoomDimensions((v) => !v)}
       />
       <div className="editor-body">
         <FurniturePalette />
         <div className="canvas-wrap">
-          <SceneCanvas scan={scan} mode={mode} showDimensions={showDimensions} />
+          <SceneCanvas
+            scan={scan}
+            mode={mode}
+            showDimensions={showDimensions}
+            showRoomDimensions={showRoomDimensions}
+          />
           <ItemPropertiesPanel />
         </div>
       </div>
