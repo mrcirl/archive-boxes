@@ -23,10 +23,12 @@ export function buildRoomGroup(points: Point2D[], wallHeightM: number): THREE.Gr
   floor.name = 'Floor';
   group.add(floor);
 
-  // Walls: one quad per polygon edge, wound to face inward (toward the
-  // room's interior) so they read correctly from a normal walk-through view.
-  const positions: number[] = [];
-  const normals: number[] = [];
+  // Walls: one quad PER EDGE, each its own Mesh — not merged into a single
+  // BufferGeometry. Transparent materials (see ScanMesh's makeScanTranslucent)
+  // need depthWrite off, and WebGL then relies on per-object back-to-front
+  // sorting for correct blending; a single mesh containing all four walls
+  // can't be sorted internally, which made near/far walls draw in the wrong
+  // order and made the room look inside-out. Separate meshes sort correctly.
   for (let i = 0; i < points.length; i++) {
     const a = points[i];
     const b = points[(i + 1) % points.length];
@@ -42,15 +44,17 @@ export function buildRoomGroup(points: Point2D[], wallHeightM: number): THREE.Gr
     const v1 = [b.x, 0, b.z];
     const v2 = [b.x, wallHeightM, b.z];
     const v3 = [a.x, wallHeightM, a.z];
-    positions.push(...v0, ...v1, ...v2, ...v0, ...v2, ...v3);
+    const positions = [...v0, ...v1, ...v2, ...v0, ...v2, ...v3];
+    const normals: number[] = [];
     for (let k = 0; k < 6; k++) normals.push(nx, 0, nz);
+
+    const wallGeometry = new THREE.BufferGeometry();
+    wallGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    wallGeometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall.name = `Wall${i}`;
+    group.add(wall);
   }
-  const wallGeometry = new THREE.BufferGeometry();
-  wallGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  wallGeometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-  const walls = new THREE.Mesh(wallGeometry, wallMaterial);
-  walls.name = 'Walls';
-  group.add(walls);
 
   return group;
 }

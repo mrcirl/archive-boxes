@@ -63,6 +63,29 @@ as a real scan file. From that point on a drawn room *is* a scan — same
 table, same viewer, same camera framing, same room-size toggle, nothing
 downstream needed to know the difference.
 
+Each wall is its own `Mesh` rather than one merged geometry (see the
+comment in `roomMesh.ts`) — translucent materials need `depthWrite: false`
+to blend correctly, and WebGL falls back to per-*object* back-to-front
+sorting for that, which can't happen correctly within a single mesh
+containing all four walls.
+
+The polygon and wall height are also sent alongside the file upload
+(`wallPoints`/`wallHeightM` form fields, stored on `scans.wall_points_json` /
+`wall_height_m`) purely so the viewer can show real per-wall dimensions
+later — see "Room size" above.
+
+**Gotcha if you touch scan/model centering:** drei's `<Center>` component's
+`top`/`bottom` props are inverted from what their names suggest — `bottom`
+aligns the object's *top* edge to the origin (object hangs below), `top`
+aligns the *bottom* edge to the origin (object stands on it, extending
+upward). Every scan and furniture model in this app wants the latter, so
+they all use `<Center top>`. Using `bottom` (the intuitive-looking name)
+was an early bug here that silently placed every room's floor a full wall
+-height below the origin, with the ceiling sitting at floor level instead —
+easy to miss since the camera auto-fits to bounds regardless of where they
+sit, and it only became obvious as a visibly inside-out room once a
+simple, symmetric drawn box was tested rather than a complex scan.
+
 ## How it works
 
 1. Upload a scan, or draw one from scratch — either way it's stored on the
@@ -90,14 +113,16 @@ downstream needed to know the difference.
    label floating over every placed item at once (not just the selected
    one), in both 3D and 2D — handy for eyeballing a whole layout's sizes
    without clicking through each item's properties panel. "📐 Room size" is
-   a separate toggle for the scanned room's own overall size: a label in
-   both views, plus measured edges with tick marks along two sides in the
-   2D floor plan. Real scans are rarely simple rectangles (rotated,
-   irregular footprints are the norm — see the attic example above), so
-   this is always labeled as the axis-aligned bounding box, not the exact
-   footprint or individual wall lengths; getting real per-wall measurements
-   would need actual wall-segment detection, which is a separate, bigger
-   feature.
+   a separate toggle for the scanned room's own overall size. Real scans are
+   rarely simple rectangles (rotated, irregular footprints are the norm —
+   see the attic example above), and a generic scan/USDZ-converted mesh
+   doesn't carry per-wall data, so those get a bounding-box-only label plus
+   measured edges with tick marks along two sides in the 2D floor plan,
+   explicitly labeled as a bounding box rather than the real footprint or
+   wall lengths. Rooms created via "Draw a room" *do* know their exact wall
+   polygon, so they get real per-wall length labels at every wall instead
+   (in both views), and the overall label drops the "bounding box"
+   qualifier since it's now exact.
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 

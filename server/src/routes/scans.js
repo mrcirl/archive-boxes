@@ -61,9 +61,32 @@ scansRouter.post('/upload', (req, res) => {
     const format = FORMAT_BY_EXT[ext];
     const id = crypto.randomUUID();
 
+    // Optional metadata from the "draw a room" flow: the exact polygon that
+    // was extruded into this GLB, so the viewer can show real per-wall
+    // lengths instead of just an axis-aligned bounding box.
+    let wallPointsJson = null;
+    let wallHeightM = null;
+    if (typeof req.body.wallPoints === 'string') {
+      try {
+        const parsed = JSON.parse(req.body.wallPoints);
+        const valid =
+          Array.isArray(parsed) &&
+          parsed.length >= 3 &&
+          parsed.length <= 200 &&
+          parsed.every((p) => p && Number.isFinite(p.x) && Number.isFinite(p.z));
+        if (valid) wallPointsJson = JSON.stringify(parsed);
+      } catch {
+        // ignore malformed metadata — the scan upload itself still succeeds
+      }
+    }
+    if (wallPointsJson) {
+      const h = parseFloat(req.body.wallHeightM);
+      if (Number.isFinite(h) && h > 0 && h < 100) wallHeightM = h;
+    }
+
     db.prepare(
-      `INSERT INTO scans (id, original_name, stored_name, format, size_bytes) VALUES (?, ?, ?, ?, ?)`
-    ).run(id, req.file.originalname, req.file.filename, format, req.file.size);
+      `INSERT INTO scans (id, original_name, stored_name, format, size_bytes, wall_points_json, wall_height_m) VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, req.file.originalname, req.file.filename, format, req.file.size, wallPointsJson, wallHeightM);
 
     if (format === 'usdz') {
       // RoomPlan-style USDZ (ASCII .usda inside the zip) can be converted to

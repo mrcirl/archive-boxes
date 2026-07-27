@@ -29,7 +29,7 @@ function GlbCustomModel({ url, target }: { url: string; target: FitTarget }) {
   const scale = useFitScale(gltf.scene, target);
   return (
     <group scale={scale}>
-      <Center bottom>
+      <Center top>
         <primitive object={gltf.scene} />
       </Center>
     </group>
@@ -49,7 +49,7 @@ function ObjCustomModel({ url, target }: { url: string; target: FitTarget }) {
   const scale = useFitScale(withMaterial, target);
   return (
     <group scale={scale}>
-      <Center bottom>
+      <Center top>
         <primitive object={withMaterial} />
       </Center>
     </group>

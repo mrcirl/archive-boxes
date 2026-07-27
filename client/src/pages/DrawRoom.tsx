@@ -84,7 +84,7 @@ export function DrawRoom({ navigate }: { navigate: (path: string) => void }) {
       const file = new File([blob], `${(roomName || 'Room').replace(/[^\w\- ]+/g, '')}.glb`, {
         type: 'model/gltf-binary',
       });
-      const scan = await scansApi.upload(file);
+      const scan = await scansApi.upload(file, { wallPoints: points, wallHeightM });
       const project = await projectsApi.create(roomName || 'New Room', scan.id);
       navigate(`/project/${project.id}`);
     } catch (e) {

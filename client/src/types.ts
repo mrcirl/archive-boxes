@@ -9,6 +9,11 @@ export interface Scan {
   preview_format: 'glb' | null;
   preview_stored_name: string | null;
   preview_error: string | null;
+  /** Present only for rooms created via "Draw a room" — the exact polygon
+   * that was extruded into this scan's geometry, letting the viewer show
+   * real per-wall lengths instead of just a bounding box. */
+  wall_points_json: string | null;
+  wall_height_m: number | null;
   created_at: string;
 }
 

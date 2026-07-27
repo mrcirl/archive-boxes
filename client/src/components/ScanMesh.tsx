@@ -87,7 +87,7 @@ export function ScanMesh({ scan }: { scan: Scan }) {
     }
     return (
       <Suspense fallback={<Html center>Loading scan…</Html>}>
-        <Center bottom>
+        <Center top>
           <GlbScan url={previewUrl} />
         </Center>
       </Suspense>
@@ -97,7 +97,7 @@ export function ScanMesh({ scan }: { scan: Scan }) {
   const url = scanFileUrl(scan);
   return (
     <Suspense fallback={<Html center>Loading scan…</Html>}>
-      <Center bottom>
+      <Center top>
         {scan.format === 'obj' ? <ObjScan url={url} /> : <GlbScan url={url} />}
       </Center>
     </Suspense>

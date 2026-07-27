@@ -32,9 +32,13 @@ export function assetUrl(url: string): string {
 export const scansApi = {
   list: () => request<Scan[]>('/api/scans'),
   get: (id: string) => request<Scan>(`/api/scans/${id}`),
-  upload: (file: File) => {
+  upload: (file: File, wallMeta?: { wallPoints: { x: number; z: number }[]; wallHeightM: number }) => {
     const form = new FormData();
     form.append('scan', file);
+    if (wallMeta) {
+      form.append('wallPoints', JSON.stringify(wallMeta.wallPoints));
+      form.append('wallHeightM', String(wallMeta.wallHeightM));
+    }
     return request<Scan>('/api/scans/upload', { method: 'POST', body: form });
   },
   remove: (id: string) => request<void>(`/api/scans/${id}`, { method: 'DELETE' }),

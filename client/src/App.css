@@ -515,6 +515,11 @@ button.active {
   transform: translateY(-4px);
 }
 
+.dimension-label.wall-label {
+  border-color: #7fb3ff;
+  color: #cfe3ff;
+}
+
 .room-dimension-label {
   background: rgba(20, 21, 26, 0.9);
   border: 1px solid #4a6b8a;

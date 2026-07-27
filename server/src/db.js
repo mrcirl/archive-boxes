@@ -20,6 +20,8 @@ db.exec(`
     preview_format TEXT,
     preview_stored_name TEXT,
     preview_error TEXT,
+    wall_points_json TEXT,
+    wall_height_m REAL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -48,5 +50,7 @@ ensureColumns('scans', [
   ['preview_format', 'TEXT'],
   ['preview_stored_name', 'TEXT'],
   ['preview_error', 'TEXT'],
+  ['wall_points_json', 'TEXT'],
+  ['wall_height_m', 'REAL'],
 ]);
 ensureColumns('projects', [['custom_items_json', "TEXT NOT NULL DEFAULT '[]'"]]);

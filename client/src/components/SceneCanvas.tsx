@@ -143,7 +143,7 @@ export function SceneCanvas({
       <Grid args={[200, 200]} cellColor="#888" sectionColor="#555" fadeDistance={80} position={[0, 0, 0]} />
       <DragPlane />
       <ScanMesh scan={scan} />
-      {showRoomDimensions && <RoomDimensions mode={mode} />}
+      {showRoomDimensions && <RoomDimensions mode={mode} scan={scan} />}
       {furniture.map((item) => (
         <FurnitureMesh key={item.id} item={item} mode={mode} showDimensions={showDimensions} />
       ))}
