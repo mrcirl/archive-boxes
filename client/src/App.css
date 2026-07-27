@@ -526,3 +526,35 @@ button.active {
   white-space: nowrap;
   pointer-events: none;
 }
+
+.draw-room-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.draw-room-canvas {
+  border: 1px solid #2c2e38;
+  border-radius: 10px;
+  cursor: crosshair;
+  flex-shrink: 0;
+}
+
+.draw-room-sidebar {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.draw-room-info {
+  background: #1d1f27;
+  border: 1px solid #2c2e38;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #c3c4cd;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

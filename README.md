@@ -50,10 +50,23 @@ You can still run the halves separately (`npm run dev` inside `server/` or
 `client/`) if you prefer. The client reads the API base URL from
 `client/.env` (`VITE_API_BASE`, defaults to `http://localhost:4000`).
 
+## Drawing a room without a scan
+
+"Draw a room" on the dashboard opens a 2D corner-by-corner polygon tool
+(`client/src/pages/DrawRoom.tsx`) — click to place each wall corner, click
+the first point again to close the shape, set a wall height, and it
+generates a real extruded floor+wall mesh (`client/src/geometry/roomMesh.ts`),
+exports it to GLB client-side with three.js's `GLTFExporter` (the browser
+has native `FileReader`, so none of the Node polyfilling the USDZ converter
+needs), and uploads it through the exact same `/api/scans/upload` endpoint
+as a real scan file. From that point on a drawn room *is* a scan — same
+table, same viewer, same camera framing, same room-size toggle, nothing
+downstream needed to know the difference.
+
 ## How it works
 
-1. Upload a scan on the Upload page — it's stored on the server and listed on
-   the dashboard.
+1. Upload a scan, or draw one from scratch — either way it's stored on the
+   server and listed on the dashboard.
 2. Create a project from a scan to open the editor.
 3. The editor renders the scan mesh in a `three.js` scene. Toggle between a
    3D orbit view and a 2D top-down floor plan (an orthographic camera looking

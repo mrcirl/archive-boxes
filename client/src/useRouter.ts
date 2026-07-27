@@ -1,11 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 
-export type Route = { name: 'dashboard' } | { name: 'upload' } | { name: 'project'; id: string };
+export type Route =
+  | { name: 'dashboard' }
+  | { name: 'upload' }
+  | { name: 'draw' }
+  | { name: 'project'; id: string };
 
 function parse(pathname: string): Route {
   const projectMatch = pathname.match(/^\/project\/([^/]+)$/);
   if (projectMatch) return { name: 'project', id: projectMatch[1] };
   if (pathname === '/upload') return { name: 'upload' };
+  if (pathname === '/draw') return { name: 'draw' };
   return { name: 'dashboard' };
 }
 

@@ -2,6 +2,7 @@ import './App.css';
 import { useRouter } from './useRouter';
 import { Dashboard } from './pages/Dashboard';
 import { UploadScan } from './pages/UploadScan';
+import { DrawRoom } from './pages/DrawRoom';
 import { ProjectEditor } from './pages/ProjectEditor';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
     <div className="app-shell">
       {route.name === 'dashboard' && <Dashboard navigate={navigate} />}
       {route.name === 'upload' && <UploadScan navigate={navigate} />}
+      {route.name === 'draw' && <DrawRoom navigate={navigate} />}
       {route.name === 'project' && <ProjectEditor projectId={route.id} navigate={navigate} />}
     </div>
   );

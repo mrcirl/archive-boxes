@@ -36,13 +36,18 @@ export function Dashboard({ navigate }: { navigate: (path: string) => void }) {
     <div className="page">
       <div className="page-header">
         <h1>Office Layouts</h1>
-        <button onClick={() => navigate('/upload')}>Upload a 3D scan</button>
+        <div className="toolbar-group">
+          <button onClick={() => navigate('/draw')}>Draw a room</button>
+          <button onClick={() => navigate('/upload')}>Upload a 3D scan</button>
+        </div>
       </div>
       {error && <div className="error-banner">{error}</div>}
 
       <section>
         <h2>Projects</h2>
-        {projects.length === 0 && <p className="hint">No layouts yet — upload a scan to get started.</p>}
+        {projects.length === 0 && (
+          <p className="hint">No layouts yet — draw a room or upload a scan to get started.</p>
+        )}
         <div className="card-grid">
           {projects.map((p) => (
             <button key={p.id} className="card" onClick={() => navigate(`/project/${p.id}`)}>
