@@ -63,11 +63,23 @@ function CameraRig({
     const radius = Math.sqrt(horizontal ** 2 + vertical ** 2) / 2;
     const fov = 50;
     const dist = (radius / Math.sin(THREE.MathUtils.degToRad(fov / 2))) * 1.25;
+
+    // Fixed viewing angle rather than height scaled off the room's overall
+    // diagonal — for a room that's wide but short (e.g. an attic with a
+    // large footprint and a low sloped ceiling), scaling height off the
+    // diagonal put the camera above the roofline entirely, looking straight
+    // down onto the exterior instead of into the room.
+    const azimuth = THREE.MathUtils.degToRad(40);
+    const elevation = THREE.MathUtils.degToRad(28);
+    const dirX = Math.cos(elevation) * Math.sin(azimuth);
+    const dirY = Math.sin(elevation);
+    const dirZ = Math.cos(elevation) * Math.cos(azimuth);
+
     return (
       <>
         <PerspectiveCamera
           makeDefault
-          position={[dist * 0.6, dist * 0.5 + targetY, dist * 0.6]}
+          position={[dirX * dist, targetY + dirY * dist, dirZ * dist]}
           fov={fov}
         />
         <OrbitControls
