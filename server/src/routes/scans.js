@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { db } from '../db.js';
+import { convertUsdzToGlb, UnsupportedUsdzError } from '../usdz/convert.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
@@ -52,7 +53,7 @@ scansRouter.get('/:id', (req, res) => {
 });
 
 scansRouter.post('/upload', (req, res) => {
-  upload.single('scan')(req, res, (err) => {
+  upload.single('scan')(req, res, async (err) => {
     if (err) return res.status(400).json({ error: err.message });
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
@@ -63,6 +64,27 @@ scansRouter.post('/upload', (req, res) => {
     db.prepare(
       `INSERT INTO scans (id, original_name, stored_name, format, size_bytes) VALUES (?, ?, ?, ?, ?)`
     ).run(id, req.file.originalname, req.file.filename, format, req.file.size);
+
+    if (format === 'usdz') {
+      // RoomPlan-style USDZ (ASCII .usda inside the zip) can be converted to
+      // GLB for in-browser preview. Binary "crate" USDZ can't — leave the
+      // preview fields null and record why, so the UI can say so.
+      try {
+        const glb = await convertUsdzToGlb(path.join(uploadsDir, req.file.filename));
+        const previewName = `${id}-preview.glb`;
+        fs.writeFileSync(path.join(uploadsDir, previewName), glb);
+        db.prepare(
+          `UPDATE scans SET preview_format = 'glb', preview_stored_name = ? WHERE id = ?`
+        ).run(previewName, id);
+      } catch (convertErr) {
+        const message =
+          convertErr instanceof UnsupportedUsdzError
+            ? convertErr.message
+            : 'Could not convert this USDZ for preview.';
+        console.error('USDZ conversion failed for', req.file.originalname, convertErr);
+        db.prepare(`UPDATE scans SET preview_error = ? WHERE id = ?`).run(message, id);
+      }
+    }
 
     const scan = db.prepare('SELECT * FROM scans WHERE id = ?').get(id);
     res.status(201).json(scan);
@@ -82,5 +104,8 @@ scansRouter.delete('/:id', (req, res) => {
 
   db.prepare('DELETE FROM scans WHERE id = ?').run(req.params.id);
   fs.rm(path.join(uploadsDir, scan.stored_name), { force: true }, () => {});
+  if (scan.preview_stored_name) {
+    fs.rm(path.join(uploadsDir, scan.preview_stored_name), { force: true }, () => {});
+  }
   res.status(204).send();
 });

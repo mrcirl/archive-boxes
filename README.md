@@ -15,10 +15,17 @@ both a full 3D view and an auto top-down 2D floor plan.
 
 - **GLB / GLTF** and **OBJ** — fully supported, rendered directly in the
   browser in both 3D and 2D (top-down orthographic) views.
-- **USDZ** (e.g. Apple RoomPlan / iPhone LiDAR exports) — accepted and stored,
-  but there is no in-browser USD parser, so no live preview is rendered for
-  USDZ files yet. Export your scan as GLB or OBJ (most scanning apps offer
-  this alongside USDZ) for a full preview.
+- **USDZ** (e.g. Apple RoomPlan / iPhone LiDAR exports) — converted to GLB on
+  upload (`server/src/usdz`) when the USDZ is built from plain-text USD
+  (`.usda`), which is what RoomPlan actually produces. The converter extracts
+  `Mesh` prims (points/normals/face indices/local transform) and flat
+  `diffuseColor` materials from every `.usda` entry in the archive, applies
+  each mesh's transform, and exports the result as a GLB via three.js's
+  `GLTFExporter`, so it's previewed through the same GLTFLoader path as native
+  GLB uploads. Binary "crate" USD (`.usdc`) has no available parser here and
+  isn't supported — those files are still stored and attached to the project,
+  just without a live preview (`scan.preview_error` explains why). Export as
+  GLB or OBJ instead if you hit that.
 
 ## Running locally
 
@@ -57,6 +64,8 @@ defaults to `http://localhost:4000`).
 
 ## Data model
 
-- `scans`: uploaded file metadata (`format`, `stored_name`, `size_bytes`).
+- `scans`: uploaded file metadata (`format`, `stored_name`, `size_bytes`), plus
+  optional `preview_format`/`preview_stored_name` (the converted GLB, for
+  USDZ) and `preview_error` (why conversion was skipped, if it was).
 - `projects`: a named layout tied to one scan, with a `furniture` array of
   `{ id, type, x, z, rotationY }` placements.

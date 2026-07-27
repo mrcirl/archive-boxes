@@ -5,7 +5,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { Html, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Scan } from '../types';
-import { scanFileUrl } from '../api';
+import { scanFileUrl, scanPreviewUrl } from '../api';
 import { useBoundsStore } from '../store/boundsStore';
 
 function useReportBounds(object: THREE.Object3D) {
@@ -40,11 +40,11 @@ function ObjScan({ url }: { url: string }) {
   return <primitive object={withMaterial} />;
 }
 
-function UnsupportedScan({ format }: { format: string }) {
+function UnsupportedScan({ reason }: { reason: string }) {
   return (
     <Html center>
       <div className="scan-unsupported-note">
-        Preview isn't available for <strong>.{format}</strong> scans in the browser yet.
+        {reason}
         <br />
         Export your scan as GLB or OBJ for a full 3D/2D preview — the file is still stored
         and attached to this project.
@@ -54,7 +54,6 @@ function UnsupportedScan({ format }: { format: string }) {
 }
 
 export function ScanMesh({ scan }: { scan: Scan }) {
-  const url = scanFileUrl(scan);
   const clearBounds = useBoundsStore((s) => s.clear);
 
   useEffect(() => {
@@ -62,9 +61,27 @@ export function ScanMesh({ scan }: { scan: Scan }) {
   }, [scan.id, clearBounds]);
 
   if (scan.format === 'usdz') {
-    return <UnsupportedScan format="usdz" />;
+    const previewUrl = scanPreviewUrl(scan);
+    if (!previewUrl) {
+      return (
+        <UnsupportedScan
+          reason={
+            scan.preview_error ??
+            "Preview isn't available for this .usdz scan in the browser yet."
+          }
+        />
+      );
+    }
+    return (
+      <Suspense fallback={<Html center>Loading scan…</Html>}>
+        <Center bottom>
+          <GlbScan url={previewUrl} />
+        </Center>
+      </Suspense>
+    );
   }
 
+  const url = scanFileUrl(scan);
   return (
     <Suspense fallback={<Html center>Loading scan…</Html>}>
       <Center bottom>

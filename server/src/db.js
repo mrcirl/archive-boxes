@@ -17,6 +17,9 @@ db.exec(`
     stored_name TEXT NOT NULL,
     format TEXT NOT NULL,
     size_bytes INTEGER NOT NULL,
+    preview_format TEXT,
+    preview_stored_name TEXT,
+    preview_error TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -29,3 +32,15 @@ db.exec(`
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
+
+// Migration guard for dev DBs created before preview columns existed.
+const scanColumns = new Set(db.prepare('PRAGMA table_info(scans)').all().map((c) => c.name));
+for (const [col, def] of [
+  ['preview_format', 'TEXT'],
+  ['preview_stored_name', 'TEXT'],
+  ['preview_error', 'TEXT'],
+]) {
+  if (!scanColumns.has(col)) {
+    db.exec(`ALTER TABLE scans ADD COLUMN ${col} ${def}`);
+  }
+}

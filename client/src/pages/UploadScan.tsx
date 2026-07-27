@@ -74,11 +74,11 @@ export function UploadScan({ navigate }: { navigate: (path: string) => void }) {
       <div className="note-box">
         <strong>About USDZ scans (e.g. Apple RoomPlan / iPhone LiDAR exports):</strong>
         <p>
-          USDZ files are stored and attached to your project, but there's no in-browser 3D
-          preview for USDZ yet — browsers have no native USD parser. For a full 3D and
-          floor-plan preview, export your scan as <strong>GLB</strong> or <strong>OBJ</strong>{' '}
-          instead (most scanning apps, including Polycam and Scaniverse, offer this as an
-          export option alongside USDZ).
+          USDZ files are converted on upload for preview when they're built from plain-text
+          USD (the common case for RoomPlan exports). Some USDZ files use a binary USD format
+          that can't be converted — those are still stored and attached to your project, just
+          without a live preview. If you hit that, export your scan as <strong>GLB</strong> or{' '}
+          <strong>OBJ</strong> instead for a guaranteed full 3D and floor-plan preview.
         </p>
       </div>
 

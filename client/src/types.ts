@@ -6,6 +6,9 @@ export interface Scan {
   stored_name: string;
   format: ScanFormat;
   size_bytes: number;
+  preview_format: 'glb' | null;
+  preview_stored_name: string | null;
+  preview_error: string | null;
   created_at: string;
 }
 

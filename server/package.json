@@ -9,9 +9,11 @@
     "dev": "node --watch src/index.js"
   },
   "dependencies": {
+    "adm-zip": "^0.6.0",
     "better-sqlite3": "^11.3.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "three": "^0.185.1"
   }
 }

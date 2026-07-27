@@ -19,6 +19,10 @@ export function scanFileUrl(scan: Scan): string {
   return `${API_BASE}/uploads/${scan.stored_name}`;
 }
 
+export function scanPreviewUrl(scan: Scan): string | null {
+  return scan.preview_stored_name ? `${API_BASE}/uploads/${scan.preview_stored_name}` : null;
+}
+
 export const scansApi = {
   list: () => request<Scan[]>('/api/scans'),
   get: (id: string) => request<Scan>(`/api/scans/${id}`),
