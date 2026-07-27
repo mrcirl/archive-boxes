@@ -20,6 +20,9 @@ export interface FurnitureInstance {
   type: string;
   x: number;
   z: number;
+  /** Height of the item's base above the floor — 0 for normal floor-standing
+   * placement, positive for wall-mounted/floating items (e.g. a shelf). */
+  y?: number;
   rotationY: number;
   label?: string;
   /** Per-instance overrides of the item definition's real dimensions. */

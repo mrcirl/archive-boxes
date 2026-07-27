@@ -467,6 +467,42 @@ button.active {
   color: #8b8c98;
 }
 
+.item-props-section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6f7180;
+  margin-top: 4px;
+}
+
+.prop-field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.prop-field-row .prop-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.prop-input-wrap.scrub {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+.prop-input-wrap.scrub input {
+  cursor: text;
+}
+
+.prop-input-wrap.scrub.dragging {
+  border-radius: 6px;
+  outline: 1px solid #4da3ff;
+}
+
+.prop-input-wrap.scrub.dragging input {
+  cursor: ew-resize;
+}
+
 .dimension-label {
   background: rgba(20, 21, 26, 0.85);
   border: 1px solid #3a3c48;

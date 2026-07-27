@@ -145,7 +145,7 @@ export function FurnitureMesh({
   const boxHeight = hasPhotoOnly ? Math.min(0.06, def.heightM) : def.heightM;
 
   return (
-    <group position={[item.x, 0, item.z]} rotation={[0, item.rotationY, 0]}>
+    <group position={[item.x, item.y ?? 0, item.z]} rotation={[0, item.rotationY, 0]}>
       {def.modelUrl ? (
         <group onPointerDown={onPointerDown}>
           <CustomModel

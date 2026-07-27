@@ -61,10 +61,14 @@ You can still run the halves separately (`npm run dev` inside `server/` or
 4. Click a furniture item in the palette to add it, then drag it around on
    the scan to position it; use the rotate/delete controls for the selected
    item. A newly added item is auto-selected, opening a properties panel
-   where you can set its real width/depth/height (per placed item — two
-   desks from the same catalog entry can differ) and its structure: solid,
+   where you can set its exact position (X/Z, plus a "height off floor" for
+   wall-mounted or floating items like a shelf), real width/depth/height
+   (per placed item — two desks from the same catalog entry can differ),
+   and its structure: solid,
    hollow with an open top (box/bin), or hollow with an open front
-   (rack/bookcase). Hollow items render as actual shells with a visibly
+   (rack/bookcase). Every numeric field in the panel is a scrub input —
+   click-and-drag left/right to change the value (0.5cm per pixel), or
+   click without moving to type an exact number. Hollow items render as actual shells with a visibly
    darker cavity, and the opening rotates with the item. "🔓 Lock to floor"
    in the toolbar locks the selected item in place — dragging, rotating, and
    deleting are all blocked (in both the UI and the store's own action
