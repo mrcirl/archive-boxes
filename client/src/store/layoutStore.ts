@@ -8,16 +8,19 @@ interface LayoutState {
   customItems: CustomItem[];
   selectedId: string | null;
   draggingId: string | null;
+  verticalDraggingId: string | null;
   dirty: boolean;
   load: (furniture: FurnitureInstance[], customItems: CustomItem[]) => void;
   addItem: (type: string) => void;
   setPosition: (id: string, x: number, z: number) => void;
+  setHeight: (id: string, y: number) => void;
   updateItem: (id: string, patch: Partial<FurnitureInstance>) => void;
   rotateItem: (id: string, deltaRad: number) => void;
   removeItem: (id: string) => void;
   toggleLock: (id: string) => void;
   select: (id: string | null) => void;
   setDragging: (id: string | null) => void;
+  setVerticalDragging: (id: string | null) => void;
   markSaved: () => void;
   addCustomItem: (item: Omit<CustomItem, 'id'>) => CustomItem;
   removeCustomItem: (id: string) => void;
@@ -28,6 +31,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   customItems: [],
   selectedId: null,
   draggingId: null,
+  verticalDraggingId: null,
   dirty: false,
 
   load: (furniture, customItems) => set({ furniture, customItems, dirty: false, selectedId: null }),
@@ -45,6 +49,14 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   setPosition: (id, x, z) =>
     set((state) => ({
       furniture: state.furniture.map((f) => (f.id === id && !f.locked ? { ...f, x, z } : f)),
+      dirty: true,
+    })),
+
+  setHeight: (id, y) =>
+    set((state) => ({
+      furniture: state.furniture.map((f) =>
+        f.id === id && !f.locked ? { ...f, y: Math.max(0, y) } : f
+      ),
       dirty: true,
     })),
 
@@ -81,6 +93,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
 
   select: (id) => set({ selectedId: id }),
   setDragging: (id) => set({ draggingId: id }),
+  setVerticalDragging: (id) => set({ verticalDraggingId: id }),
   markSaved: () => set({ dirty: false }),
 
   addCustomItem: (item) => {

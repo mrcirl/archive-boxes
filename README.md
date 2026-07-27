@@ -104,7 +104,14 @@ simple, symmetric drawn box was tested rather than a complex scan.
    hollow with an open top (box/bin), or hollow with an open front
    (rack/bookcase). Every numeric field in the panel is a scrub input —
    click-and-drag left/right to change the value (0.5cm per pixel), or
-   click without moving to type an exact number. Hollow items render as actual shells with a visibly
+   click without moving to type an exact number. Height off floor can also be
+   dragged directly in the 3D view: a selected item shows a small handle
+   floating just above it — click-and-drag it up/down to change the item's
+   height on the spot, without opening the panel. The handle is a billboard
+   plane that always faces the camera around the world Y axis, so dragging
+   "up on screen" raises the item regardless of the current orbit angle; it
+   defaults new items to the ground (0) and only appears in 3D view on an
+   unlocked, selected item. Hollow items render as actual shells with a visibly
    darker cavity, and the opening rotates with the item. "🔓 Lock to floor"
    in the toolbar locks the selected item in place — dragging, rotating, and
    deleting are all blocked (in both the UI and the store's own action

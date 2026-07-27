@@ -114,6 +114,39 @@ function DimensionLabel({ w, d, h, y }: { w: number; d: number; h: number; y: nu
   );
 }
 
+/** Click-and-drag grip shown above a selected item (3D view only) for
+ * adjusting its height off the floor directly in the viewport, mirroring
+ * the horizontal drag on the item body itself. */
+function VerticalHandle({
+  y,
+  locked,
+  onPointerDown,
+}: {
+  y: number;
+  locked?: boolean;
+  onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
+}) {
+  const color = locked ? '#e0a63e' : '#4da3ff';
+  return (
+    <group position={[0, y, 0]}>
+      <mesh position={[0, -0.09, 0]}>
+        <cylinderGeometry args={[0.004, 0.004, 0.18, 6]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      {/* Larger invisible sphere as the actual hit target — the visible
+          grip is deliberately small so it doesn't clutter the scene. */}
+      <mesh onPointerDown={onPointerDown}>
+        <sphereGeometry args={[0.09, 10, 10]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[0.035, 12, 12]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+    </group>
+  );
+}
+
 export function FurnitureMesh({
   item,
   mode,
@@ -127,6 +160,7 @@ export function FurnitureMesh({
   const def = resolveInstanceDef(item, customItems);
   const select = useLayoutStore((s) => s.select);
   const setDragging = useLayoutStore((s) => s.setDragging);
+  const setVerticalDragging = useLayoutStore((s) => s.setVerticalDragging);
   const selectedId = useLayoutStore((s) => s.selectedId);
   const isSelected = selectedId === item.id;
 
@@ -134,6 +168,13 @@ export function FurnitureMesh({
     e.stopPropagation();
     select(item.id);
     if (!item.locked) setDragging(item.id);
+  };
+
+  const onVerticalPointerDown = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    if (item.locked) return;
+    select(item.id);
+    setVerticalDragging(item.id);
   };
 
   // With a reference photo (and no model), draw the box as a thin footprint
@@ -185,6 +226,10 @@ export function FurnitureMesh({
           <ringGeometry args={[Math.max(def.widthM, def.depthM) * 0.62, Math.max(def.widthM, def.depthM) * 0.68, 32]} />
           <meshBasicMaterial color={item.locked ? '#e0a63e' : '#4da3ff'} />
         </mesh>
+      )}
+
+      {isSelected && mode === '3d' && (
+        <VerticalHandle y={def.heightM + 0.35} locked={item.locked} onPointerDown={onVerticalPointerDown} />
       )}
     </group>
   );
