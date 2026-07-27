@@ -12,6 +12,7 @@ interface LayoutState {
   load: (furniture: FurnitureInstance[], customItems: CustomItem[]) => void;
   addItem: (type: string) => void;
   setPosition: (id: string, x: number, z: number) => void;
+  updateItem: (id: string, patch: Partial<FurnitureInstance>) => void;
   rotateItem: (id: string, deltaRad: number) => void;
   removeItem: (id: string) => void;
   select: (id: string | null) => void;
@@ -31,17 +32,24 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   load: (furniture, customItems) => set({ furniture, customItems, dirty: false, selectedId: null }),
 
   addItem: (type) =>
-    set((state) => ({
-      furniture: [
-        ...state.furniture,
-        { id: crypto.randomUUID(), type, x: 0, z: 0, rotationY: 0 },
-      ],
-      dirty: true,
-    })),
+    set((state) => {
+      const newItem = { id: crypto.randomUUID(), type, x: 0, z: 0, rotationY: 0 };
+      return {
+        furniture: [...state.furniture, newItem],
+        selectedId: newItem.id,
+        dirty: true,
+      };
+    }),
 
   setPosition: (id, x, z) =>
     set((state) => ({
       furniture: state.furniture.map((f) => (f.id === id ? { ...f, x, z } : f)),
+      dirty: true,
+    })),
+
+  updateItem: (id, patch) =>
+    set((state) => ({
+      furniture: state.furniture.map((f) => (f.id === id ? { ...f, ...patch } : f)),
       dirty: true,
     })),
 

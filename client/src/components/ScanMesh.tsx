@@ -20,24 +20,37 @@ function useReportBounds(object: THREE.Object3D) {
   }, [object, setBounds]);
 }
 
+/** Room scans are viewed mostly from outside — opaque walls would hide the
+ * furniture being arranged inside, so render the scan semi-transparent. */
+function makeScanTranslucent(root: THREE.Object3D) {
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (!child.material) {
+      child.material = new THREE.MeshStandardMaterial({ color: '#b7b7b7' });
+    }
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    for (const mat of materials) {
+      mat.transparent = true;
+      mat.opacity = 0.45;
+      mat.side = THREE.DoubleSide;
+      mat.depthWrite = false;
+    }
+  });
+  return root;
+}
+
 function GlbScan({ url }: { url: string }) {
   const gltf = useLoader(GLTFLoader, url);
-  useReportBounds(gltf.scene);
-  return <primitive object={gltf.scene} />;
+  const translucent = useMemo(() => makeScanTranslucent(gltf.scene), [gltf.scene]);
+  useReportBounds(translucent);
+  return <primitive object={translucent} />;
 }
 
 function ObjScan({ url }: { url: string }) {
   const obj = useLoader(OBJLoader, url);
-  const withMaterial = useMemo(() => {
-    obj.traverse((child) => {
-      if (child instanceof THREE.Mesh && !child.material) {
-        child.material = new THREE.MeshStandardMaterial({ color: '#b7b7b7' });
-      }
-    });
-    return obj;
-  }, [obj]);
-  useReportBounds(withMaterial);
-  return <primitive object={withMaterial} />;
+  const translucent = useMemo(() => makeScanTranslucent(obj), [obj]);
+  useReportBounds(translucent);
+  return <primitive object={translucent} />;
 }
 
 function UnsupportedScan({ reason }: { reason: string }) {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { assetsApi, assetUrl, imageSearchApi } from '../api';
 import { useLayoutStore } from '../store/layoutStore';
-import type { ImageSearchResult } from '../types';
+import type { HollowStyle, ImageSearchResult } from '../types';
 
 type Unit = 'cm' | 'in';
 
@@ -20,6 +20,7 @@ export function AddCustomItemModal({ onClose }: { onClose: () => void }) {
   const [depth, setDepth] = useState('');
   const [height, setHeight] = useState('');
   const [color, setColor] = useState('#8a6a4a');
+  const [hollow, setHollow] = useState<HollowStyle>('none');
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoLabel, setPhotoLabel] = useState<string | null>(null);
@@ -96,6 +97,7 @@ export function AddCustomItemModal({ onClose }: { onClose: () => void }) {
       depthM,
       heightM,
       color,
+      hollow,
       photoUrl,
       modelUrl,
       modelFormat,
@@ -144,6 +146,15 @@ export function AddCustomItemModal({ onClose }: { onClose: () => void }) {
         <label className="field">
           <span>Color</span>
           <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+        </label>
+
+        <label className="field">
+          <span>Structure</span>
+          <select value={hollow} onChange={(e) => setHollow(e.target.value as HollowStyle)}>
+            <option value="none">Solid block</option>
+            <option value="top">Hollow — open top (box/bin)</option>
+            <option value="front">Hollow — open front (rack/shelf)</option>
+          </select>
         </label>
 
         <div className="field">

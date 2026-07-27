@@ -1,17 +1,110 @@
-import { useRef } from 'react';
+import { useMemo } from 'react';
 import type { ThreeEvent } from '@react-three/fiber';
-import type { Mesh } from 'three';
-import { resolveItemDef } from '../furniture/catalog';
+import * as THREE from 'three';
+import { resolveInstanceDef } from '../furniture/catalog';
 import { useLayoutStore } from '../store/layoutStore';
 import { assetUrl } from '../api';
 import { CustomModel, PhotoBillboard } from './CustomItemVisual';
-import type { FurnitureInstance } from '../types';
+import type { FurnitureInstance, HollowStyle } from '../types';
 import type { ViewMode } from './Toolbar';
+
+interface PanelMaterialProps {
+  color: string;
+  isSelected: boolean;
+}
+
+function PanelMaterial({ color, isSelected }: PanelMaterialProps) {
+  return (
+    <meshStandardMaterial
+      color={color}
+      emissive={isSelected ? '#ffffff' : '#000000'}
+      emissiveIntensity={isSelected ? 0.25 : 0}
+    />
+  );
+}
+
+/** An open shell built from panels instead of a solid block: 'top' is a
+ * box/bin open at the top, 'front' is a rack/bookcase open toward +z (the
+ * item's local front, so rotating the item turns the opening with it). */
+function HollowShell({
+  w,
+  h,
+  d,
+  style,
+  color,
+  isSelected,
+}: {
+  w: number;
+  h: number;
+  d: number;
+  style: Exclude<HollowStyle, 'none'>;
+  color: string;
+  isSelected: boolean;
+}) {
+  const t = Math.min(0.03, Math.min(w, h, d) * 0.15);
+  const mat = <PanelMaterial color={color} isSelected={isSelected} />;
+  // Same-color interiors read as a closed block from a distance, so shade
+  // the cavity distinctly darker — the dark opening is what makes the item
+  // legible as hollow at plan-view zoom levels.
+  const cavityColor = useMemo(
+    () => `#${new THREE.Color(color).multiplyScalar(0.35).getHexString()}`,
+    [color]
+  );
+
+  return (
+    <group>
+      {/* bottom */}
+      <mesh position={[0, t / 2, 0]} castShadow>
+        <boxGeometry args={[w, t, d]} />
+        {mat}
+      </mesh>
+      {/* cavity: a darker inset volume recessed behind the opening, so the
+          item reads as hollow from any viewing angle */}
+      {style === 'top' ? (
+        <mesh position={[0, t + (h - t - Math.min(0.08, h * 0.15)) / 2, 0]}>
+          <boxGeometry args={[w - 2 * t, h - t - Math.min(0.08, h * 0.15), d - 2 * t]} />
+          <meshStandardMaterial color={cavityColor} />
+        </mesh>
+      ) : (
+        <mesh position={[0, h / 2, (t - Math.min(0.08, d * 0.15)) / 2]}>
+          <boxGeometry args={[w - 2 * t, h - 2 * t, d - t - Math.min(0.08, d * 0.15)]} />
+          <meshStandardMaterial color={cavityColor} />
+        </mesh>
+      )}
+      {/* left / right walls */}
+      <mesh position={[-w / 2 + t / 2, h / 2, 0]} castShadow>
+        <boxGeometry args={[t, h, d]} />
+        {mat}
+      </mesh>
+      <mesh position={[w / 2 - t / 2, h / 2, 0]} castShadow>
+        <boxGeometry args={[t, h, d]} />
+        {mat}
+      </mesh>
+      {/* back wall */}
+      <mesh position={[0, h / 2, -d / 2 + t / 2]} castShadow>
+        <boxGeometry args={[w, h, t]} />
+        {mat}
+      </mesh>
+      {style === 'top' ? (
+        /* open top → keep the front wall */
+        <mesh position={[0, h / 2, d / 2 - t / 2]} castShadow>
+          <boxGeometry args={[w, h, t]} />
+          {mat}
+        </mesh>
+      ) : (
+        /* open front → keep the top panel */
+        <mesh position={[0, h - t / 2, 0]} castShadow>
+          <boxGeometry args={[w, t, d]} />
+          {mat}
+        </mesh>
+      )}
+    </group>
+  );
+}
 
 export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: ViewMode }) {
   const customItems = useLayoutStore((s) => s.customItems);
-  const def = resolveItemDef(item.type, customItems);
-  const meshRef = useRef<Mesh>(null);
+  const def = resolveInstanceDef(item, customItems);
   const select = useLayoutStore((s) => s.select);
   const setDragging = useLayoutStore((s) => s.setDragging);
   const selectedId = useLayoutStore((s) => s.selectedId);
@@ -27,7 +120,8 @@ export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: V
   // pad instead of full height — a full box would swallow the billboard,
   // which sits at the item's real height and is what actually identifies it
   // in 3D. The pad still carries the correct width/depth for 2D/selection.
-  const hasPhotoOnly = !def.modelUrl && !!def.photoUrl;
+  const hollow = def.hollow ?? 'none';
+  const hasPhotoOnly = !def.modelUrl && !!def.photoUrl && hollow === 'none';
   const boxHeight = hasPhotoOnly ? Math.min(0.06, def.heightM) : def.heightM;
 
   return (
@@ -40,24 +134,26 @@ export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: V
             target={{ w: def.widthM, h: def.heightM, d: def.depthM }}
           />
         </group>
-      ) : (
-        <mesh
-          ref={meshRef}
-          position={[0, boxHeight / 2, 0]}
-          onPointerDown={onPointerDown}
-          castShadow
-        >
-          <boxGeometry args={[def.widthM, boxHeight, def.depthM]} />
-          <meshStandardMaterial
+      ) : hollow !== 'none' ? (
+        <group onPointerDown={onPointerDown}>
+          <HollowShell
+            w={def.widthM}
+            h={def.heightM}
+            d={def.depthM}
+            style={hollow}
             color={def.color}
-            emissive={isSelected ? '#ffffff' : '#000000'}
-            emissiveIntensity={isSelected ? 0.25 : 0}
+            isSelected={isSelected}
           />
+        </group>
+      ) : (
+        <mesh position={[0, boxHeight / 2, 0]} onPointerDown={onPointerDown} castShadow>
+          <boxGeometry args={[def.widthM, boxHeight, def.depthM]} />
+          <PanelMaterial color={def.color} isSelected={isSelected} />
         </mesh>
       )}
 
-      {hasPhotoOnly && mode === '3d' && (
-        <PhotoBillboard url={assetUrl(def.photoUrl!)} widthM={def.widthM} heightM={def.heightM} />
+      {!def.modelUrl && def.photoUrl && mode === '3d' && (
+        <PhotoBillboard url={assetUrl(def.photoUrl)} widthM={def.widthM} heightM={def.heightM} />
       )}
 
       {isSelected && (

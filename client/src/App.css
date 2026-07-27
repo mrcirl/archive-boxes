@@ -406,3 +406,63 @@ button.active {
   gap: 8px;
   margin-top: 6px;
 }
+
+.field select,
+.item-props select {
+  background: #14151a;
+  border: 1px solid #3a3c48;
+  border-radius: 6px;
+  color: #e8e8ec;
+  padding: 8px;
+}
+
+/* Selected item properties panel (floats over the canvas) */
+
+.item-props {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 210px;
+  background: rgba(29, 31, 39, 0.95);
+  border: 1px solid #2c2e38;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.item-props-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.prop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #c3c4cd;
+}
+
+.prop-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prop-input-wrap input {
+  flex: 1;
+  min-width: 0;
+  background: #14151a;
+  border: 1px solid #3a3c48;
+  border-radius: 6px;
+  color: #e8e8ec;
+  padding: 6px 8px;
+}
+
+.prop-input-wrap .unit {
+  color: #8b8c98;
+}

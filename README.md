@@ -60,7 +60,12 @@ You can still run the halves separately (`npm run dev` inside `server/` or
    straight down at the same scene — no separate wall-detection step).
 4. Click a furniture item in the palette to add it, then drag it around on
    the scan to position it; use the rotate/delete controls for the selected
-   item.
+   item. A newly added item is auto-selected, opening a properties panel
+   where you can set its real width/depth/height (per placed item — two
+   desks from the same catalog entry can differ) and its structure: solid,
+   hollow with an open top (box/bin), or hollow with an open front
+   (rack/bookcase). Hollow items render as actual shells with a visibly
+   darker cavity, and the opening rotates with the item.
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 

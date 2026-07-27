@@ -4,6 +4,7 @@ import type { Project, Scan } from '../types';
 import { useLayoutStore } from '../store/layoutStore';
 import { SceneCanvas } from '../components/SceneCanvas';
 import { FurniturePalette } from '../components/FurniturePalette';
+import { ItemPropertiesPanel } from '../components/ItemPropertiesPanel';
 import { Toolbar, type ViewMode } from '../components/Toolbar';
 
 export function ProjectEditor({
@@ -75,6 +76,7 @@ export function ProjectEditor({
         <FurniturePalette />
         <div className="canvas-wrap">
           <SceneCanvas scan={scan} mode={mode} />
+          <ItemPropertiesPanel />
         </div>
       </div>
     </div>

@@ -12,6 +12,9 @@ export interface Scan {
   created_at: string;
 }
 
+/** 'none' = solid block, 'top' = open-top shell (box/bin), 'front' = open-front shell (rack/bookcase). */
+export type HollowStyle = 'none' | 'top' | 'front';
+
 export interface FurnitureInstance {
   id: string;
   type: string;
@@ -19,6 +22,11 @@ export interface FurnitureInstance {
   z: number;
   rotationY: number;
   label?: string;
+  /** Per-instance overrides of the item definition's real dimensions. */
+  widthM?: number;
+  depthM?: number;
+  heightM?: number;
+  hollow?: HollowStyle;
 }
 
 export interface CustomItem {
@@ -31,6 +39,7 @@ export interface CustomItem {
   photoUrl: string | null;
   modelUrl: string | null;
   modelFormat: 'glb' | 'gltf' | 'obj' | null;
+  hollow?: HollowStyle;
 }
 
 export interface Project {

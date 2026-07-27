@@ -1,4 +1,4 @@
-import type { CustomItem } from '../types';
+import type { CustomItem, FurnitureInstance, HollowStyle } from '../types';
 import { CUSTOM_TYPE_PREFIX } from '../store/layoutStore';
 
 export interface FurnitureDef {
@@ -8,6 +8,7 @@ export interface FurnitureDef {
   widthM: number;
   depthM: number;
   heightM: number;
+  hollow?: HollowStyle;
   photoUrl?: string | null;
   modelUrl?: string | null;
   modelFormat?: 'glb' | 'gltf' | 'obj' | null;
@@ -36,6 +37,7 @@ export function customItemToDef(item: CustomItem): FurnitureDef {
     widthM: item.widthM,
     depthM: item.depthM,
     heightM: item.heightM,
+    hollow: item.hollow,
     photoUrl: item.photoUrl,
     modelUrl: item.modelUrl,
     modelFormat: item.modelFormat,
@@ -51,4 +53,20 @@ export function resolveItemDef(type: string, customItems: CustomItem[]): Furnitu
     if (custom) return customItemToDef(custom);
   }
   return FURNITURE_CATALOG.find((f) => f.type === type) ?? FURNITURE_CATALOG[0];
+}
+
+/** Definition merged with any per-instance dimension/hollow overrides —
+ * what actually gets rendered and measured for a placed item. */
+export function resolveInstanceDef(
+  instance: FurnitureInstance,
+  customItems: CustomItem[]
+): FurnitureDef {
+  const def = resolveItemDef(instance.type, customItems);
+  return {
+    ...def,
+    widthM: instance.widthM ?? def.widthM,
+    depthM: instance.depthM ?? def.depthM,
+    heightM: instance.heightM ?? def.heightM,
+    hollow: instance.hollow ?? def.hollow ?? 'none',
+  };
 }
