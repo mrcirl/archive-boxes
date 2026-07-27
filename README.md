@@ -84,6 +84,18 @@ You can still run the halves separately (`npm run dev` inside `server/` or
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 
+## Furniture models
+
+The built-in catalog (Desk, L-Desk, Chair, Round Table, Filing Cabinet,
+Bookshelf, Sofa, Plant, Monitor, Laptop) renders real 3D models, not colored
+boxes — [Kenney's "Furniture Kit"](https://kenney.nl/assets/furniture-kit)
+(CC0, see `client/public/models/LICENSE.txt`), non-uniformly scaled per-axis
+to each catalog entry's real-world dimensions via the same fit-to-box path
+used for custom item models. The pack's own models aren't modeled at
+real-world scale internally, so target sizes were chosen for realism and
+checked against each model's natural aspect ratio to avoid visible
+distortion, not copied from the source asset.
+
 ## Custom items
 
 Beyond the built-in catalog (desk, chair, sofa, …), "+ New item" in the

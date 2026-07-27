@@ -24,7 +24,9 @@ export function scanPreviewUrl(scan: Scan): string | null {
 }
 
 export function assetUrl(url: string): string {
-  return /^https?:\/\//.test(url) ? url : `${API_BASE}${url}`;
+  if (/^https?:\/\//.test(url)) return url; // external (e.g. Wikimedia reference photo)
+  if (url.startsWith('/uploads/')) return `${API_BASE}${url}`; // server-uploaded asset
+  return url; // bundled client asset (e.g. /models/desk.glb, served by Vite itself)
 }
 
 export const scansApi = {

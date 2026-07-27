@@ -1,0 +1,21 @@
+Furniture Kit (2.0)
+Created/distributed by Kenney (www.kenney.nl)
+Source: https://kenney.nl/assets/furniture-kit
+
+License: Creative Commons Zero (CC0)
+http://creativecommons.org/publicdomain/zero/1.0/
+
+Free to use in personal, educational and commercial projects.
+Credit is appreciated but not required.
+
+Files in this directory (renamed from the original pack, unmodified geometry):
+  desk.glb                 <- Models/GLTF format/desk.glb
+  deskCorner.glb            <- Models/GLTF format/deskCorner.glb
+  chairDesk.glb             <- Models/GLTF format/chairDesk.glb
+  tableRound.glb            <- Models/GLTF format/tableRound.glb
+  kitchenCabinetDrawer.glb  <- Models/GLTF format/kitchenCabinetDrawer.glb
+  bookcaseOpen.glb          <- Models/GLTF format/bookcaseOpen.glb
+  loungeSofa.glb            <- Models/GLTF format/loungeSofa.glb
+  pottedPlant.glb           <- Models/GLTF format/pottedPlant.glb
+  computerScreen.glb        <- Models/GLTF format/computerScreen.glb
+  laptop.glb                <- Models/GLTF format/laptop.glb
