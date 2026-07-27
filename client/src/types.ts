@@ -21,11 +21,32 @@ export interface FurnitureInstance {
   label?: string;
 }
 
+export interface CustomItem {
+  id: string;
+  name: string;
+  widthM: number;
+  depthM: number;
+  heightM: number;
+  color: string;
+  photoUrl: string | null;
+  modelUrl: string | null;
+  modelFormat: 'glb' | 'gltf' | 'obj' | null;
+}
+
 export interface Project {
   id: string;
   name: string;
   scan_id: string;
   furniture: FurnitureInstance[];
+  customItems: CustomItem[];
   created_at: string;
   updated_at: string;
+}
+
+export interface ImageSearchResult {
+  title: string;
+  thumbUrl: string;
+  pageUrl: string;
+  license: string | null;
+  artist: string | null;
 }

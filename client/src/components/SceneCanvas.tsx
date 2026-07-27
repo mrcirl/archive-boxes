@@ -121,7 +121,7 @@ export function SceneCanvas({ scan, mode }: { scan: Scan; mode: ViewMode }) {
       <DragPlane />
       <ScanMesh scan={scan} />
       {furniture.map((item) => (
-        <FurnitureMesh key={item.id} item={item} />
+        <FurnitureMesh key={item.id} item={item} mode={mode} />
       ))}
     </Canvas>
   );

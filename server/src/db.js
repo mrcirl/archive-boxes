@@ -28,19 +28,25 @@ db.exec(`
     name TEXT NOT NULL,
     scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
     furniture_json TEXT NOT NULL DEFAULT '[]',
+    custom_items_json TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
 
-// Migration guard for dev DBs created before preview columns existed.
-const scanColumns = new Set(db.prepare('PRAGMA table_info(scans)').all().map((c) => c.name));
-for (const [col, def] of [
+function ensureColumns(table, columns) {
+  const existing = new Set(db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name));
+  for (const [col, def] of columns) {
+    if (!existing.has(col)) {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+    }
+  }
+}
+
+// Migration guards for dev DBs created before these columns existed.
+ensureColumns('scans', [
   ['preview_format', 'TEXT'],
   ['preview_stored_name', 'TEXT'],
   ['preview_error', 'TEXT'],
-]) {
-  if (!scanColumns.has(col)) {
-    db.exec(`ALTER TABLE scans ADD COLUMN ${col} ${def}`);
-  }
-}
+]);
+ensureColumns('projects', [['custom_items_json', "TEXT NOT NULL DEFAULT '[]'"]]);

@@ -62,10 +62,36 @@ defaults to `http://localhost:4000`).
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 
+## Custom items
+
+Beyond the built-in catalog (desk, chair, sofa, …), "+ New item" in the
+palette lets you define your own, scoped to that project:
+
+- **Name + real dimensions** (width/depth/height, in cm or inches) — this is
+  what actually drives space planning, so it's required.
+- **A reference photo** (your own upload, and/or a best-effort search of the
+  Wikimedia Commons API — no API key needed, and its content is under clear
+  free licenses, unlike hotlinking arbitrary web images; results are a visual
+  reference only, not a verified product match). With a photo and no model,
+  the item renders as a thin footprint pad at its correct size plus a
+  camera-facing photo card in the 3D view — the pad alone (no card) in the 2D
+  floor plan, since a camera-facing card there would just look like a flat
+  top-down patch and wouldn't convey the footprint.
+- **A 3D model** (GLB/GLTF/OBJ) — takes priority over the photo/box, and is
+  non-uniformly scaled per-axis to fit exactly the width/height/depth you
+  entered (space-planning accuracy over preserving the model's native
+  proportions).
+
+Uploaded photos/models go through `POST /api/assets/upload` and are served
+from `/uploads` like scans.
+
 ## Data model
 
 - `scans`: uploaded file metadata (`format`, `stored_name`, `size_bytes`), plus
   optional `preview_format`/`preview_stored_name` (the converted GLB, for
   USDZ) and `preview_error` (why conversion was skipped, if it was).
 - `projects`: a named layout tied to one scan, with a `furniture` array of
-  `{ id, type, x, z, rotationY }` placements.
+  `{ id, type, x, z, rotationY }` placements and a `customItems` array of
+  `{ id, name, widthM, depthM, heightM, color, photoUrl, modelUrl, modelFormat }`.
+  A furniture instance's `type` is either a built-in catalog key (`"desk"`,
+  `"chair"`, …) or `"custom:<customItem.id>"`.

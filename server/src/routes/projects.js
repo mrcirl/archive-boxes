@@ -5,7 +5,11 @@ import { db } from '../db.js';
 export const projectsRouter = Router();
 
 function serialize(row) {
-  return { ...row, furniture: JSON.parse(row.furniture_json) };
+  return {
+    ...row,
+    furniture: JSON.parse(row.furniture_json),
+    customItems: JSON.parse(row.custom_items_json),
+  };
 }
 
 projectsRouter.get('/', (_req, res) => {
@@ -28,8 +32,8 @@ projectsRouter.post('/', (req, res) => {
 
   const id = crypto.randomUUID();
   db.prepare(
-    'INSERT INTO projects (id, name, scan_id, furniture_json) VALUES (?, ?, ?, ?)'
-  ).run(id, name, scanId, '[]');
+    'INSERT INTO projects (id, name, scan_id, furniture_json, custom_items_json) VALUES (?, ?, ?, ?, ?)'
+  ).run(id, name, scanId, '[]', '[]');
 
   res.status(201).json(serialize(db.prepare('SELECT * FROM projects WHERE id = ?').get(id)));
 });
@@ -38,16 +42,20 @@ projectsRouter.put('/:id', (req, res) => {
   const existing = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Project not found' });
 
-  const { name, furniture } = req.body;
+  const { name, furniture, customItems } = req.body;
   if (furniture !== undefined && !Array.isArray(furniture)) {
     return res.status(400).json({ error: 'furniture must be an array' });
   }
+  if (customItems !== undefined && !Array.isArray(customItems)) {
+    return res.status(400).json({ error: 'customItems must be an array' });
+  }
 
   db.prepare(
-    `UPDATE projects SET name = ?, furniture_json = ?, updated_at = datetime('now') WHERE id = ?`
+    `UPDATE projects SET name = ?, furniture_json = ?, custom_items_json = ?, updated_at = datetime('now') WHERE id = ?`
   ).run(
     name ?? existing.name,
     furniture !== undefined ? JSON.stringify(furniture) : existing.furniture_json,
+    customItems !== undefined ? JSON.stringify(customItems) : existing.custom_items_json,
     req.params.id
   );
 

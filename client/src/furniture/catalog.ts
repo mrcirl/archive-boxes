@@ -1,3 +1,6 @@
+import type { CustomItem } from '../types';
+import { CUSTOM_TYPE_PREFIX } from '../store/layoutStore';
+
 export interface FurnitureDef {
   type: string;
   label: string;
@@ -5,6 +8,9 @@ export interface FurnitureDef {
   widthM: number;
   depthM: number;
   heightM: number;
+  photoUrl?: string | null;
+  modelUrl?: string | null;
+  modelFormat?: 'glb' | 'gltf' | 'obj' | null;
 }
 
 export const FURNITURE_CATALOG: FurnitureDef[] = [
@@ -18,6 +24,31 @@ export const FURNITURE_CATALOG: FurnitureDef[] = [
   { type: 'plant', label: 'Plant', color: '#3f7a3f', widthM: 0.5, depthM: 0.5, heightM: 1.1 },
 ];
 
-export function getFurnitureDef(type: string): FurnitureDef {
+export function customItemType(id: string): string {
+  return `${CUSTOM_TYPE_PREFIX}${id}`;
+}
+
+export function customItemToDef(item: CustomItem): FurnitureDef {
+  return {
+    type: customItemType(item.id),
+    label: item.name,
+    color: item.color,
+    widthM: item.widthM,
+    depthM: item.depthM,
+    heightM: item.heightM,
+    photoUrl: item.photoUrl,
+    modelUrl: item.modelUrl,
+    modelFormat: item.modelFormat,
+  };
+}
+
+/** Resolves a furniture instance's `type` to its definition, checking the
+ * built-in catalog first and falling back to a project's custom items. */
+export function resolveItemDef(type: string, customItems: CustomItem[]): FurnitureDef {
+  if (type.startsWith(CUSTOM_TYPE_PREFIX)) {
+    const id = type.slice(CUSTOM_TYPE_PREFIX.length);
+    const custom = customItems.find((c) => c.id === id);
+    if (custom) return customItemToDef(custom);
+  }
   return FURNITURE_CATALOG.find((f) => f.type === type) ?? FURNITURE_CATALOG[0];
 }

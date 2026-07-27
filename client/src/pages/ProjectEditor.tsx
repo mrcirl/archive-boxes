@@ -20,6 +20,7 @@ export function ProjectEditor({
   const [error, setError] = useState<string | null>(null);
   const load = useLayoutStore((s) => s.load);
   const furniture = useLayoutStore((s) => s.furniture);
+  const customItems = useLayoutStore((s) => s.customItems);
   const markSaved = useLayoutStore((s) => s.markSaved);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function ProjectEditor({
       .then(async (p) => {
         if (cancelled) return;
         setProject(p);
-        load(p.furniture);
+        load(p.furniture, p.customItems);
         const s = await scansApi.get(p.scan_id);
         if (!cancelled) setScan(s);
       })
@@ -43,7 +44,7 @@ export function ProjectEditor({
     if (!project) return;
     setSaving(true);
     try {
-      await projectsApi.update(project.id, { furniture });
+      await projectsApi.update(project.id, { furniture, customItems });
       markSaved();
     } catch (e) {
       setError((e as Error).message);

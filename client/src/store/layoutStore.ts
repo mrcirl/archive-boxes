@@ -1,12 +1,15 @@
 import { create } from 'zustand';
-import type { FurnitureInstance } from '../types';
+import type { CustomItem, FurnitureInstance } from '../types';
+
+export const CUSTOM_TYPE_PREFIX = 'custom:';
 
 interface LayoutState {
   furniture: FurnitureInstance[];
+  customItems: CustomItem[];
   selectedId: string | null;
   draggingId: string | null;
   dirty: boolean;
-  load: (furniture: FurnitureInstance[]) => void;
+  load: (furniture: FurnitureInstance[], customItems: CustomItem[]) => void;
   addItem: (type: string) => void;
   setPosition: (id: string, x: number, z: number) => void;
   rotateItem: (id: string, deltaRad: number) => void;
@@ -14,15 +17,18 @@ interface LayoutState {
   select: (id: string | null) => void;
   setDragging: (id: string | null) => void;
   markSaved: () => void;
+  addCustomItem: (item: Omit<CustomItem, 'id'>) => CustomItem;
+  removeCustomItem: (id: string) => void;
 }
 
 export const useLayoutStore = create<LayoutState>((set) => ({
   furniture: [],
+  customItems: [],
   selectedId: null,
   draggingId: null,
   dirty: false,
 
-  load: (furniture) => set({ furniture, dirty: false, selectedId: null }),
+  load: (furniture, customItems) => set({ furniture, customItems, dirty: false, selectedId: null }),
 
   addItem: (type) =>
     set((state) => ({
@@ -57,4 +63,19 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   select: (id) => set({ selectedId: id }),
   setDragging: (id) => set({ draggingId: id }),
   markSaved: () => set({ dirty: false }),
+
+  addCustomItem: (item) => {
+    const newItem: CustomItem = { ...item, id: crypto.randomUUID() };
+    set((state) => ({ customItems: [...state.customItems, newItem], dirty: true }));
+    return newItem;
+  },
+
+  removeCustomItem: (id) => {
+    const type = `${CUSTOM_TYPE_PREFIX}${id}`;
+    set((state) => ({
+      customItems: state.customItems.filter((c) => c.id !== id),
+      furniture: state.furniture.filter((f) => f.type !== type),
+      dirty: true,
+    }));
+  },
 }));
