@@ -1,10 +1,12 @@
 import { useRef } from 'react';
-import { Canvas, type ThreeEvent } from '@react-three/fiber';
+import { Canvas, useThree, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, OrthographicCamera, PerspectiveCamera, Grid } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import * as THREE from 'three';
 import { ScanMesh } from './ScanMesh';
 import { FurnitureMesh } from './FurnitureMesh';
 import { useLayoutStore } from '../store/layoutStore';
+import { useBoundsStore } from '../store/boundsStore';
 import type { Scan } from '../types';
 import type { ViewMode } from './Toolbar';
 
@@ -31,9 +33,76 @@ function DragPlane() {
       onPointerLeave={onPointerUp}
       visible={false}
     >
-      <planeGeometry args={[200, 200]} />
+      <planeGeometry args={[500, 500]} />
       <meshBasicMaterial />
     </mesh>
+  );
+}
+
+/**
+ * Frames the camera to the loaded scan's actual bounding box instead of a
+ * fixed distance/zoom, since real scans range from tiny nooks to whole floors.
+ */
+function CameraRig({
+  mode,
+  enabled,
+  controlsRef,
+}: {
+  mode: ViewMode;
+  enabled: boolean;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
+}) {
+  const bounds = useBoundsStore((s) => s.bounds);
+  const { size } = useThree();
+
+  const horizontal = Math.max(bounds?.sizeX ?? 4, bounds?.sizeZ ?? 4, 0.5);
+  const vertical = Math.max(bounds?.sizeY ?? 2.5, 0.5);
+  const targetY = vertical / 2;
+
+  if (mode === '3d') {
+    const radius = Math.sqrt(horizontal ** 2 + vertical ** 2) / 2;
+    const fov = 50;
+    const dist = (radius / Math.sin(THREE.MathUtils.degToRad(fov / 2))) * 1.25;
+    return (
+      <>
+        <PerspectiveCamera
+          makeDefault
+          position={[dist * 0.6, dist * 0.5 + targetY, dist * 0.6]}
+          fov={fov}
+        />
+        <OrbitControls
+          ref={controlsRef}
+          makeDefault
+          enabled={enabled}
+          enableRotate
+          target={[0, targetY, 0]}
+          minDistance={0.3}
+          maxDistance={dist * 5}
+        />
+      </>
+    );
+  }
+
+  const padding = 1.3;
+  const zoom = Math.min(size.width, size.height) / (horizontal * padding);
+  return (
+    <>
+      <OrthographicCamera
+        makeDefault
+        position={[0, Math.max(horizontal, vertical) * 2 + 5, 0]}
+        zoom={zoom}
+        up={[0, 0, -1]}
+        near={0.1}
+        far={2000}
+      />
+      <OrbitControls
+        ref={controlsRef}
+        makeDefault
+        enabled={enabled}
+        enableRotate={false}
+        target={[0, 0, 0]}
+      />
+    </>
   );
 }
 
@@ -45,23 +114,10 @@ export function SceneCanvas({ scan, mode }: { scan: Scan; mode: ViewMode }) {
 
   return (
     <Canvas shadows onPointerMissed={() => select(null)}>
-      {mode === '3d' ? (
-        <PerspectiveCamera makeDefault position={[6, 6, 6]} fov={50} />
-      ) : (
-        <OrthographicCamera makeDefault position={[0, 12, 0]} zoom={60} up={[0, 0, -1]} />
-      )}
-      <OrbitControls
-        ref={controlsRef}
-        makeDefault
-        enabled={!draggingId}
-        enableRotate={mode === '3d'}
-        minDistance={1}
-        maxDistance={40}
-        target={[0, 0, 0]}
-      />
+      <CameraRig mode={mode} enabled={!draggingId} controlsRef={controlsRef} />
       <ambientLight intensity={0.7} />
       <directionalLight position={[5, 10, 5]} intensity={1} castShadow />
-      <Grid args={[40, 40]} cellColor="#888" sectionColor="#555" fadeDistance={30} position={[0, 0, 0]} />
+      <Grid args={[200, 200]} cellColor="#888" sectionColor="#555" fadeDistance={80} position={[0, 0, 0]} />
       <DragPlane />
       <ScanMesh scan={scan} />
       {furniture.map((item) => (
