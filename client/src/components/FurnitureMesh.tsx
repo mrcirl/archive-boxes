@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ThreeEvent } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { resolveInstanceDef } from '../furniture/catalog';
 import { useLayoutStore } from '../store/layoutStore';
@@ -102,7 +103,26 @@ function HollowShell({
   );
 }
 
-export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: ViewMode }) {
+function DimensionLabel({ w, d, h, y }: { w: number; d: number; h: number; y: number }) {
+  const cm = (m: number) => Math.round(m * 100);
+  return (
+    <Html position={[0, y, 0]} center zIndexRange={[0, 0]}>
+      <div className="dimension-label">
+        {cm(w)} × {cm(d)} × {cm(h)} cm
+      </div>
+    </Html>
+  );
+}
+
+export function FurnitureMesh({
+  item,
+  mode,
+  showDimensions,
+}: {
+  item: FurnitureInstance;
+  mode: ViewMode;
+  showDimensions: boolean;
+}) {
   const customItems = useLayoutStore((s) => s.customItems);
   const def = resolveInstanceDef(item, customItems);
   const select = useLayoutStore((s) => s.select);
@@ -154,6 +174,10 @@ export function FurnitureMesh({ item, mode }: { item: FurnitureInstance; mode: V
 
       {!def.modelUrl && def.photoUrl && mode === '3d' && (
         <PhotoBillboard url={assetUrl(def.photoUrl)} widthM={def.widthM} heightM={def.heightM} />
+      )}
+
+      {showDimensions && (
+        <DimensionLabel w={def.widthM} d={def.depthM} h={def.heightM} y={def.heightM + 0.18} />
       )}
 
       {isSelected && (

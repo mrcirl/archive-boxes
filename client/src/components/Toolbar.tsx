@@ -7,9 +7,18 @@ interface ToolbarProps {
   onModeChange: (mode: ViewMode) => void;
   onSave: () => void;
   saving: boolean;
+  showDimensions: boolean;
+  onToggleDimensions: () => void;
 }
 
-export function Toolbar({ mode, onModeChange, onSave, saving }: ToolbarProps) {
+export function Toolbar({
+  mode,
+  onModeChange,
+  onSave,
+  saving,
+  showDimensions,
+  onToggleDimensions,
+}: ToolbarProps) {
   const dirty = useLayoutStore((s) => s.dirty);
   const selectedId = useLayoutStore((s) => s.selectedId);
   const furniture = useLayoutStore((s) => s.furniture);
@@ -28,6 +37,9 @@ export function Toolbar({ mode, onModeChange, onSave, saving }: ToolbarProps) {
         </button>
         <button className={mode === '2d' ? 'active' : ''} onClick={() => onModeChange('2d')}>
           2D Floor Plan
+        </button>
+        <button className={showDimensions ? 'active' : ''} onClick={onToggleDimensions}>
+          📏 Dimensions
         </button>
       </div>
 

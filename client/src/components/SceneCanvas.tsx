@@ -118,7 +118,15 @@ function CameraRig({
   );
 }
 
-export function SceneCanvas({ scan, mode }: { scan: Scan; mode: ViewMode }) {
+export function SceneCanvas({
+  scan,
+  mode,
+  showDimensions,
+}: {
+  scan: Scan;
+  mode: ViewMode;
+  showDimensions: boolean;
+}) {
   const furniture = useLayoutStore((s) => s.furniture);
   const select = useLayoutStore((s) => s.select);
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -133,7 +141,7 @@ export function SceneCanvas({ scan, mode }: { scan: Scan; mode: ViewMode }) {
       <DragPlane />
       <ScanMesh scan={scan} />
       {furniture.map((item) => (
-        <FurnitureMesh key={item.id} item={item} mode={mode} />
+        <FurnitureMesh key={item.id} item={item} mode={mode} showDimensions={showDimensions} />
       ))}
     </Canvas>
   );

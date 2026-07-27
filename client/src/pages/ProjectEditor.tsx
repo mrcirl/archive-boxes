@@ -17,6 +17,7 @@ export function ProjectEditor({
   const [project, setProject] = useState<Project | null>(null);
   const [scan, setScan] = useState<Scan | null>(null);
   const [mode, setMode] = useState<ViewMode>('3d');
+  const [showDimensions, setShowDimensions] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const load = useLayoutStore((s) => s.load);
@@ -71,11 +72,18 @@ export function ProjectEditor({
         <button onClick={() => navigate('/')}>← Dashboard</button>
         <h1>{project.name}</h1>
       </div>
-      <Toolbar mode={mode} onModeChange={setMode} onSave={handleSave} saving={saving} />
+      <Toolbar
+        mode={mode}
+        onModeChange={setMode}
+        onSave={handleSave}
+        saving={saving}
+        showDimensions={showDimensions}
+        onToggleDimensions={() => setShowDimensions((v) => !v)}
+      />
       <div className="editor-body">
         <FurniturePalette />
         <div className="canvas-wrap">
-          <SceneCanvas scan={scan} mode={mode} />
+          <SceneCanvas scan={scan} mode={mode} showDimensions={showDimensions} />
           <ItemPropertiesPanel />
         </div>
       </div>

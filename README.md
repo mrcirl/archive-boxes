@@ -69,7 +69,10 @@ You can still run the halves separately (`npm run dev` inside `server/` or
    in the toolbar locks the selected item in place — dragging, rotating, and
    deleting are all blocked (in both the UI and the store's own action
    guards) until you unlock it again; a locked item's selection ring turns
-   amber instead of blue as a reminder.
+   amber instead of blue as a reminder. "📏 Dimensions" toggles a W×D×H
+   label floating over every placed item at once (not just the selected
+   one), in both 3D and 2D — handy for eyeballing a whole layout's sizes
+   without clicking through each item's properties panel.
 5. "Save layout" persists furniture positions/rotations to the project via
    the API; reloading the project restores them.
 
